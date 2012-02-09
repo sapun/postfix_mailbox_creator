@@ -20,6 +20,7 @@ def initial_message
 	
 end
 
+
 def connect_mysql
 	config = File.open("mysql_config.yaml")
 	yp = YAML::load_documents( config ) { |param|
@@ -31,7 +32,11 @@ def connect_mysql
 	}
 	p yp	
 end
+
+def disconnection_mysql
+	@mysql_connection.disconnect!
+end
 puts "anymail"
 
 connect_mysql
-
+disconnection_mysql
