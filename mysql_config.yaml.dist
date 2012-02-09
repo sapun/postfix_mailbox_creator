@@ -1,0 +1,5 @@
+
+database: postfix_database
+hostname: localhost
+username: postfix_user
+password: postfix_base_pass
