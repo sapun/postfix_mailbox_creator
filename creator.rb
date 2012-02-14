@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require "rubygems"
 require "net/smtp"
-require "mysql2"
+#require "mysql2"
 require 'yaml'
 RE_EMAIL = /^[A-Za-z][._A-Za-z\d-]+@[A-Za-z\d][._A-Za-z\d-]+\.[A-Za-z]{2,}$/
 
@@ -9,26 +9,23 @@ class Creter_mails
 
 	def initialize(email)
 		if email =~ RE_EMAIL
-			@@email = email
-			puts @@email
+			@email = email
+			puts @email
 		else
 			puts "email not valid"
 			exit
 		end
+		@local_part = @email.split("@").first
+		@domain = @email.split("@").last
+		@password_now = `pwgen -1 10`
 	end
 	
-	def mail_valid?
-		# if 
-			
-		# else
-			
-		# end
-	end
 		
 	def mail_exist?
 		if @connect_mysql.query("SELECT * FROM mailbox WHERE username='#{email}'").nil?
 			return false
 		end
+		return true
 	end
 
 	def domain_exist?
@@ -38,8 +35,12 @@ class Creter_mails
 	end
 
 	def create_mail
+		@connect_mysql.query("INSERT INTO `postfix`.`mailbox` (`username`, `password`, `name`, `maildir`, `quota`,
+							 `local_part`, `domain`, `created`, `modified`,
+							 `active`) VALUES ('@email', '@password_now',
+							 '@local_part', '@domain/@@email/', '0',
+							  '@local_part', '@domain', Time.now, 'Time.now', '1'")
 		
-		return true
 	end
 
 	def connect_mysql
@@ -63,7 +64,11 @@ class Creter_mails
 end
 
 
-
-email = Creter_mails.new(ARGV[0])	
+if ARGV[0]
+	email = Creter_mails.new(ARGV[0])
+else
+	puts "Exit now"
+	exit
+end
 
 	
