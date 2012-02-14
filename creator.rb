@@ -3,18 +3,26 @@ require "rubygems"
 require "net/smtp"
 require "mysql2"
 require 'yaml'
+RE_EMAIL = /^[A-Za-z][._A-Za-z\d-]+@[A-Za-z\d][._A-Za-z\d-]+\.[A-Za-z]{2,}$/
 
 class Creter_mails
+
 	def initialize(email)
-		
+		if email =~ RE_EMAIL
+			@@email = email
+			puts @@email
+		else
+			puts "email not valid"
+			exit
+		end
 	end
 	
 	def mail_valid?
-		if 
+		# if 
 			
-		else
+		# else
 			
-		end
+		# end
 	end
 		
 	def mail_exist?
@@ -54,13 +62,8 @@ class Creter_mails
 	end
 end
 
-if ARGV.
-	
-else
-	
-end
+
 
 email = Creter_mails.new(ARGV[0])	
 
 	
-end
