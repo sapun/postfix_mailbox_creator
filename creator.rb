@@ -22,16 +22,17 @@ class Creter_mails
 	
 		
 	def mail_exist?
-		if @connect_mysql.query("SELECT * FROM mailbox WHERE username='#{email}'").nil?
+		if @connect_mysql.query("SELECT * FROM mailbox WHERE username='#{@email}'").nil?
 			return false
 		end
 		return true
 	end
 
 	def domain_exist?
-		if condition
-			return true
+		if @connect_mysql.query("SELECT * FROM domain WHERE domain= '#{@domain}'").nil?
+			return false
 		end
+		return true
 	end
 
 	def create_mail
