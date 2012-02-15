@@ -12,12 +12,13 @@ class Creter_mails
 			@email = email
 			puts @email
 		else
-			puts "email not valid"
+			puts "email is not valid"
 			exit
 		end
 		@local_part = @email.split("@").first
 		@domain = @email.split("@").last
-		@password_now = `pwgen -1 10`
+		@password_now = random_password
+		@body_hello_message = "now empty"
 	end
 	
 		
@@ -60,9 +61,13 @@ class Creter_mails
 		yp = YAML::load_documents( config ) { |param|
 			smtp = Net::SMTP.start("#{param['smtp_server']}","#{param['port']}","#{param['smtp_server']}",
             					    "#{param['username']}", "#{param['password']}", :login)
-        	smtp.send_message any, "#{param['smtp_server']}", @email
+        	smtp.send_message @body_hello_message, "#{param['smtp_server']}", @email
         	smtp.finish
         }
+	end
+	def random_password(size = 10)
+  		chars = (('a'..'z').to_a + ('0'..'9').to_a) - %w(i o 0 1 l 0)
+  		(1..size).collect{|a| chars[rand(chars.size)] }.join
 	end
 end
 
