@@ -1,0 +1,5 @@
+smtp_server: localhost
+port: 25
+sender_email: noreply@admin-mail.org
+username: noreply@admin-mail.org
+password: SimplePass

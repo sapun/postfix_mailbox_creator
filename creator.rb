@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require "rubygems"
 require "net/smtp"
-#require "mysql2"
+require "mysql2"
 require 'yaml'
 RE_EMAIL = /^[A-Za-z][._A-Za-z\d-]+@[A-Za-z\d][._A-Za-z\d-]+\.[A-Za-z]{2,}$/
 
@@ -54,12 +54,14 @@ class Creter_mails
 		}
 		p yp	
 	end	
-
-	def initial_message(email)
-		smtp = Net::SMTP.start('your.smtp.server', 25,'mail.from.domain',
-                'Your Account', 'Your Password', :login)
-        smtp.send_message any, 'from@mail', email
-        smtp.finish
+	def initial_message
+		config = File.open("smtp_config.yaml")
+		yp = YAML::load_documents( config ) { |param|
+			smtp = Net::SMTP.start("#{param['smtp_server']}","#{param['port']}","#{param['smtp_server']}",
+            					    "#{param['username']}", "#{param['password']}", :login)
+        	smtp.send_message any, "#{param['smtp_server']}", @email
+        	smtp.finish
+        }
 	end
 end
 
@@ -67,7 +69,8 @@ end
 if ARGV[0]
 	email = Creter_mails.new(ARGV[0])
 else
-	puts "Exit now"
+	puts "Put email address, please"
+	puts "get help there"
 	exit
 end
 
