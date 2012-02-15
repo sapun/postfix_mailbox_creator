@@ -1,0 +1,2 @@
+This script designed for automatic creating email in system Postfix+Mysql
+Usage "ruby creator.rb newmail@yourdomain.org"
