@@ -10,7 +10,7 @@ class Creter_mails
 	def initialize(email)
 		if email =~ RE_EMAIL
 			@email = email
-			puts @email
+			#puts @email
 		else
 			puts "email is not valid"
 			exit
@@ -18,16 +18,20 @@ class Creter_mails
 		@local_part = @email.split("@").first
 		@domain = @email.split("@").last
 		@password_now = random_password
-		@body_hello_message = "now empty"
+		@body_hello_message = <<END_OF_MESSAGE
+From: Email Administrator <sapun@gorod-skidok.com>
+To: #{@local_part} <#{@email}>
+Subject: Hellow Message
+Date: #{Time.now.to_s}
+
+Welcome to gorod-skidok email system.
+END_OF_MESSAGE
+
+		@maildir = "#{@domain}/#{@email}/"
 	end
 
 	def create_mail
 		connect_mysql
-		p @mysql_connection
-		result = @mysql_connection.query("SELECT * FROM `domain` WHERE `domain` = 'gorod-skidokdd.com' ").count
-		p result
-		#result.each { |e| puts e }
-		a = mail_exist?
 		if mail_exist? == false
 			puts "this mail alredy exists"
 			exit
@@ -36,12 +40,20 @@ class Creter_mails
 			puts "this domain unregistred"
 			exit
 		end	
-		@mysql_connection.query("INSERT INTO `postfix`.`mailbox` (`username`, `password`, `name`, `maildir`, `quota`,
-							 `local_part`, `domain`, `created`, `modified`,
-							 `active`) VALUES ('@email', '@password_now',
-							 '@local_part', '@domain/@@email/', '0',
-							  '@local_part', '@domain', 'Time.now', 'Time.now', '1'")
+		@mysql_connection.query("INSERT INTO mailbox (username, password, name, 
+								maildir, quota,local_part, domain, created, modified,
+							 	active) VALUES ('#{@email}', '#{@password_now}',
+							 	'#{@local_part}', '#{@maildir}', '0','#{@local_part}',
+							 	'#{@domain}', '#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}',
+							 	'#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}','1')")
 		
+		@mysql_connection.query("INSERT INTO alias (address, goto,domain, created, modified, active)
+								VALUES ( '#{@email}', '#{@email}','#{@domain}',
+										'#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}',
+										'#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}', '1')
+								")
+		puts @password_now
+		initial_message
 	end
 
 	protected
@@ -62,13 +74,11 @@ class Creter_mails
 	def connect_mysql
 		config = File.open("mysql_config.yaml")
 		yp = YAML::load_documents( config ) { |param|
-	  	#puts "#{param['hostname']} #{param['database']} #{param['username']} #{param['password']}"
 	  	@mysql_connection = Mysql2::Client.new(:host => "#{param['hostname']}",
 	  										   :username => "#{param['username']}",
 	  										   :password => "#{param['password']}", 
 	  										   :database => "#{param['database']}")
 		}
-		#p yp	
 	end	
 
 	def initial_message
@@ -76,7 +86,7 @@ class Creter_mails
 		yp = YAML::load_documents( config ) { |param|
 			smtp = Net::SMTP.start("#{param['smtp_server']}","#{param['port']}","#{param['smtp_server']}",
             					    "#{param['username']}", "#{param['password']}", :login)
-        	smtp.send_message @body_hello_message, "#{param['smtp_server']}", @email
+        	smtp.send_message @body_hello_message, "#{param['username']}", @email
         	smtp.finish
         }
 	end
