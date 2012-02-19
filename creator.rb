@@ -54,6 +54,7 @@ END_OF_MESSAGE
 								")
 		puts @password_now
 		initial_message
+		disconnect_mysql
 	end
 
 	protected
@@ -80,7 +81,9 @@ END_OF_MESSAGE
 	  										   :database => "#{param['database']}")
 		}
 	end	
-
+	def disconnect_mysql
+		@mysql_connection.close
+	end
 	def initial_message
 		config = File.open("smtp_config.yaml")
 		yp = YAML::load_documents( config ) { |param|
