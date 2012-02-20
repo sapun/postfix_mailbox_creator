@@ -39,14 +39,14 @@ END_OF_MESSAGE
 		if domain_exist?
 			puts "this domain unregistred"
 			exit
-		end	
-		@mysql_connection.query("INSERT INTO mailbox (username, password, name, 
+		end
+		@mysql_connection.query("INSERT INTO mailbox (username, password, name,
 								maildir, quota,local_part, domain, created, modified,
 							 	active) VALUES ('#{@email}', '#{@password_now}',
 							 	'#{@local_part}', '#{@maildir}', '0','#{@local_part}',
 							 	'#{@domain}', '#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}',
 							 	'#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}','1')")
-		
+
 		@mysql_connection.query("INSERT INTO alias (address, goto,domain, created, modified, active)
 								VALUES ( '#{@email}', '#{@email}','#{@domain}',
 										'#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}',
@@ -77,10 +77,10 @@ END_OF_MESSAGE
 		yp = YAML::load_documents( config ) { |param|
 	  	@mysql_connection = Mysql2::Client.new(:host => "#{param['hostname']}",
 	  										   :username => "#{param['username']}",
-	  										   :password => "#{param['password']}", 
+	  										   :password => "#{param['password']}",
 	  										   :database => "#{param['database']}")
 		}
-	end	
+	end
 	def disconnect_mysql
 		@mysql_connection.close
 	end
@@ -110,4 +110,4 @@ else
 end
 
 email.create_mail
-	
+
