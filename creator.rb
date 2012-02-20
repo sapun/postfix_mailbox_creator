@@ -55,17 +55,11 @@ END_OF_MESSAGE
 
 	protected
 	def mail_exist?
-		if @mysql_connection.query("SELECT * FROM mailbox WHERE username='#{@email}'").count > 0
-			return false
-		end
-		return true
+		!query("SELECT * FROM mailbox WHERE username='#{@email}'").count.zero?
 	end
 
 	def domain_exist?
-		if @mysql_connection.query("SELECT * FROM domain WHERE domain= '#{@domain}'").count > 0
-			return false
-		end
-		return true
+		!query("SELECT * FROM domain WHERE domain= '#{@domain}'").count.zero?
 	end
 
 	def connect_mysql
@@ -80,6 +74,9 @@ END_OF_MESSAGE
 	def disconnect_mysql
 		@mysql_connection.close
 	end
+	def query(query_str)
+	  @mysql_connection.query(query_str)
+  end
 	def initial_message
 		config = File.open("smtp_config.yaml")
 		yp = YAML::load_documents( config ) { |param|
