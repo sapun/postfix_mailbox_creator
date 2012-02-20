@@ -30,7 +30,7 @@ END_OF_MESSAGE
 		connect_mysql
 
 		puts "this mail alredy exists" and exit if mail_exist?
-		puts "this domain unregistred" and exit if domain_exist?
+		puts "this domain unregistred" and exit unless domain_exist?
 
 		mailbox_params = {
 		  :username   => @email,
@@ -45,7 +45,7 @@ END_OF_MESSAGE
 		 	:active     => 1
 		}
 		mailbox_fields = mailbox_params.keys.join(',')
-		mailbox_values = mailbox_params.values.map{|v| "'#{v}'"}.join(',')
+		mailbox_values = mailbox_params.values.map{|v| @mysql_connection.escape(v) }.join(',')
 		query("
 		  INSERT INTO
 		    mailbox (#{mailbox_fields})
@@ -64,11 +64,11 @@ END_OF_MESSAGE
 
 	protected
 	def mail_exist?
-		!query("SELECT * FROM mailbox WHERE username='#{@email}'").count.zero?
+		!query("SELECT count(*) AS counter FROM mailbox WHERE username='#{@email}'").first.fetch(:counter).zero?
 	end
 
 	def domain_exist?
-		!query("SELECT * FROM domain WHERE domain= '#{@domain}'").count.zero?
+		!query("SELECT count(*) AS counter FROM domain WHERE domain= '#{@domain}'").first.fetch(:counter).zero?
 	end
 
 	def connect_mysql
