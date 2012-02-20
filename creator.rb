@@ -5,19 +5,15 @@ require "mysql2"
 require 'yaml'
 RE_EMAIL = /^[A-Za-z][._A-Za-z\d-]+@[A-Za-z\d][._A-Za-z\d-]+\.[A-Za-z]{2,}$/
 
-class Creter_mails
+class MailsCreator
 
 	def initialize(email)
-		if email =~ RE_EMAIL
-			@email = email
-			#puts @email
-		else
-			puts "email is not valid"
-			exit
-		end
-		@local_part = @email.split("@").first
-		@domain = @email.split("@").last
+		puts "email is not valid" and exit unless email =~ RE_EMAIL
+
+		@email = email
+		@local_part, @domain = @email.split("@")
 		@password_now = random_password
+
 		@body_hello_message = <<END_OF_MESSAGE
 From: Email Administrator <sapun@gorod-skidok.com>
 To: #{@local_part} <#{@email}>
@@ -27,7 +23,7 @@ Date: #{Time.now.to_s}
 Welcome to gorod-skidok email system.
 END_OF_MESSAGE
 
-		@maildir = "#{@domain}/#{@email}/"
+		@maildir = File.join(@domain, @email, '')
 	end
 
 	def create_mail
@@ -102,7 +98,7 @@ end
 
 
 if ARGV[0]
-	email = Creter_mails.new(ARGV[0])
+	email = MailsCreator.new(ARGV[0])
 else
 	puts "Put email address, please"
 	puts "get help there"
