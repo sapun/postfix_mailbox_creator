@@ -45,7 +45,7 @@ END_OF_MESSAGE
 		 	:active     => 1
 		}
 		mailbox_fields = mailbox_params.keys.join(',')
-		mailbox_values = mailbox_params.values.map{|v| @mysql_connection.escape(v) }.join(',')
+		mailbox_values = mailbox_params.values.map{|v| v.is_a?(String) ? "'#{@mysql_connection.escape(v)}'" : v }.join(',')
 		query("
 		  INSERT INTO
 		    mailbox (#{mailbox_fields})
@@ -81,6 +81,7 @@ END_OF_MESSAGE
 		    :password => param['password'].to_s,
 		    :database => param['database']
 		  )
+		@mysql_connection.query_options.merge!(:symbolize_keys => true)
 	end
 
 	def disconnect_mysql
