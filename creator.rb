@@ -15,7 +15,7 @@ class MailsCreator
 		@password_now = random_password
 
 		@body_hello_message = <<END_OF_MESSAGE
-From: Email Administrator <sapun@gorod-skidok.com>
+From: Email Administrator <admin@#{@domain}>
 To: #{@local_part} <#{@email}>
 Subject: Hellow Message
 Date: #{Time.now.to_s}
@@ -28,9 +28,19 @@ END_OF_MESSAGE
 
 	def create_mail
 		connect_mysql
+		if domain_exist? == false
+			puts "this domain unregistred"
+			exit	
+		end
+		
 
-		puts "this mail alredy exists" and exit if mail_exist?
-		puts "this domain unregistred" and exit unless domain_exist?
+		if mail_exist?
+			puts "this mail alredy exists"
+			exit	
+		end
+
+		#puts "this mail alredy exists" and exit if mail_exist?
+		#puts "this domain unregistred" and exit unless domain_exist?
 
 		mailbox_params = {
 		  :username   => @email,
